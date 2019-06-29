@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lexiang.singleservice.mapper.service.ServiceOrderMapper">
+    <select id="findById" resultType="cn.lexiang.singleservice.bean.service.ServiceOrder" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+        select lx_service_serviceorder.id, lx_service_serviceorder.summary,
+               lx_service_serviceorder.categoryid, lx_service_serviceorder.time,
+               lx_service_serviceorder.price, lx_service_serviceorder.usercomment,
+               lx_service_serviceorder.servicecomment, lx_service_serviceorder.level,lx_service_serviceorder.type,
+               lx_service_serviceorder.report, lx_service_serviceorder.userid,
+               lx_service_serviceorder.serviceid, lx_service_serviceorder.consumeid,
+               lx_service_serviceorder.address, lx_service_serviceorder.starttime,
+               lx_service_serviceorder.endtime, lx_service_serviceorder.status, lx_service_servicecategory.name as categoryname
+        from lx_service_serviceorder, lx_service_servicecategory
+        where lx_service_servicecategory.id = #{id} and lx_service_serviceorder.categoryid = lx_service_servicecategory.id;
+    </select>
+    <select id="list" resultType="cn.lexiang.singleservice.bean.service.ServiceOrder" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrderQueryVo">
+        select lx_service_serviceorder.id, lx_service_serviceorder.summary,
+        lx_service_serviceorder.categoryid, lx_service_serviceorder.time,
+        lx_service_serviceorder.price, lx_service_serviceorder.usercomment,
+        lx_service_serviceorder.servicecomment, lx_service_serviceorder.level,lx_service_serviceorder.type,
+        lx_service_serviceorder.report, lx_service_serviceorder.userid,
+        lx_service_serviceorder.serviceid, lx_service_serviceorder.consumeid,
+        lx_service_serviceorder.address, lx_service_serviceorder.starttime,
+        lx_service_serviceorder.endtime, lx_service_serviceorder.status, lx_service_servicecategory.name as categoryname
+        from lx_service_serviceorder, lx_service_servicecategory
+        where lx_service_serviceorder.categoryid = lx_service_servicecategory.id
+            <if test="key != null and key != ''">
+                and id like %"#{key}"%"
+            </if>
+            <if test="userid != null">
+                and userid = #{userid}
+            </if>
+            <if test="serviceid != null">
+                and serviceid = #{serviceid}
+            </if>
+            <if test="consumeid != null">
+                and consumeid = #{consumeid}
+            </if>
+            <if test="status!=null">
+                and lx_service_serviceorder.status = #{status}
+            </if>
+            <if test="userconsume != null">
+                and (userid = #{userconsume} or consumeid = #{userconsume})
+            </if>
+        order by lx_service_serviceorder.time desc
+        limit #{start}, #{limit}
+    </select>
+    <select id="listSum" resultType="Integer" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrderQueryVo">
+        select count(*)
+        from lx_service_serviceorder, lx_service_servicecategory
+        where lx_service_serviceorder.categoryid = lx_service_servicecategory.id
+            <if test="key != null and key != ''">
+                and id like %"#{key}"%"
+            </if>
+            <if test="userid != null">
+                and userid = #{userid}
+            </if>
+            <if test="serviceid != null">
+                and serviceid = #{serviceid}
+            </if>
+            <if test="consumeid != null">
+                and consumeid = #{consumeid}
+            </if>
+            <if test="status!=null">
+                and lx_service_serviceorder.status = #{status}
+            </if>
+            <if test="userconsume != null">
+                and (userid = #{userconsume} or consumeid = #{userconsume})
+            </if>
+    </select>
+    <update id="update" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+        update lx_service_serviceorder
+        <set>
+            <if test="usercomment != null">
+                usercomment = #{usercomment}
+            </if>
+            <if test="servicecomment != null">
+                servicecomment = #{servicecomment}
+            </if>
+            <if test="report != null">
+                report = #{report}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="sum" resultType="Integer" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+        select count(*) as sum
+        from lx_service_serviceorder
+        where serviceid = #{serviceid}
+    </select>
+    <select id="levelSum" resultType="Integer" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+        select count(*) as sum
+        from lx_service_serviceorder
+        where serviceid = #{serviceid} and level = #{level}
+    </select>
+    <select id="detailOrder" resultType="cn.lexiang.singleservice.bean.service.ServiceOrder" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+          select lx_service_serviceorder.id, lx_service_serviceorder.summary,
+        lx_service_serviceorder.categoryid, lx_service_serviceorder.time,
+        lx_service_serviceorder.price, lx_service_serviceorder.usercomment,lx_service_serviceorder.type,
+        lx_service_serviceorder.servicecomment, lx_service_serviceorder.level,lx_service_serviceorder.servicejson,
+        lx_service_serviceorder.report, lx_service_serviceorder.userid,
+        lx_service_serviceorder.serviceid, lx_service_serviceorder.consumeid,
+        lx_service_serviceorder.address, lx_service_serviceorder.starttime,
+        lx_service_serviceorder.endtime, lx_service_serviceorder.status, lx_service_servicecategory.name as categoryname,lx_user_user.username as consumername,lx_user_user.headimg as userheadimg,
+               lx_user_user.summary as consumersummary
+        from lx_service_serviceorder, lx_service_servicecategory,lx_user_user
+        where lx_service_serviceorder.categoryid = lx_service_servicecategory.id and lx_service_serviceorder.consumeid=lx_user_user.id and lx_service_serviceorder.id=#{id}
+        <if test="userid != null">
+            and userid = #{userid}
+        </if>
+        <if test="serviceid != null">
+            and serviceid = #{serviceid}
+        </if>
+        <if test="consumeid != null">
+            and consumeid = #{consumeid}
+        </if>
+        <if test="status!=null">
+            and lx_service_serviceorder.status = #{status}
+        </if>
+    </select>
+    <select id="listHistoryOrder" resultType="cn.lexiang.singleservice.bean.service.ServiceOrder" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+        select lx_service_serviceorder.id, lx_service_serviceorder.summary,
+        lx_service_serviceorder.categoryid, lx_service_serviceorder.time,
+        lx_service_serviceorder.price, lx_service_serviceorder.usercomment,
+        lx_service_serviceorder.servicecomment, lx_service_serviceorder.level,lx_service_serviceorder.type,lx_service_serviceorder.servicejson,
+        lx_service_serviceorder.report, lx_service_serviceorder.userid,
+        lx_service_serviceorder.serviceid, lx_service_serviceorder.consumeid,
+        lx_service_serviceorder.address, lx_service_serviceorder.starttime,
+        lx_service_serviceorder.endtime, lx_service_serviceorder.status, lx_service_servicecategory.name as categoryname
+        from lx_service_serviceorder, lx_service_servicecategory
+        where lx_service_serviceorder.categoryid = lx_service_servicecategory.id
+        <if test="userid != null">
+            and userid = #{userid}
+        </if>
+        <if test="serviceid != null">
+            and serviceid = #{serviceid}
+        </if>
+        <if test="consumeid != null">
+            and consumeid = #{consumeid}
+        </if>
+        <if test="status!=null">
+            and lx_service_serviceorder.status = #{status}
+        </if>
+    </select>
+
+    <update id="updateOrder" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+        update lx_service_serviceorder
+        <set>
+            <if test="serviceid != null">
+                serviceid = #{serviceid},
+            </if>
+            <if test="startTime !=null">
+                starttime=#{startTime},
+            </if>
+            status = #{status}
+        </set>
+        where id = #{id}
+    </update>
+    <update id="fillOrder" parameterType="cn.lexiang.singleservice.bean.service.ServiceOrder">
+        update lx_service_serviceorder
+        <set>
+            <if test="report !=null">
+                report=#{report},
+            </if>
+            <if test="serviceid !=null">
+                serviceid=#{serviceid},
+            </if>
+            <if test="servicecomment !=null">
+                servicecomment=#{servicecomment},
+            </if>
+            <if test="endTime !=null">
+                endtime=#{endTime},
+            </if>
+            status='2'
+        </set>
+        where id= #{id}
+    </update>
+    <select id="getCatoryName" parameterType="java.util.List" resultType="cn.lexiang.singleservice.bean.service.ServiceCategory">
+            select id,name from lx_service_servicecategory where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

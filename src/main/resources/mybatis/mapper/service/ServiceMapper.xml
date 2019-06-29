@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lexiang.singleservice.mapper.service.ServiceMapper">
+    <select id="findById" parameterType="cn.lexiang.singleservice.bean.service.Service"
+            resultType="cn.lexiang.singleservice.bean.service.Service">
+        select lx_service_service.id, lx_service_service.username,lx_service_service.realname,
+               lx_service_service.nick,lx_service_service.password,lx_service_service.headimg,lx_service_service.age,
+               lx_service_service.gender,lx_service_service.summary,lx_service_service.regtime,lx_service_service.regip,
+               lx_service_service.logintime,lx_service_service.loginip,lx_service_service.userid,
+               lx_service_service.address,lx_service_service.servicestatus,lx_service_service.role, lx_service_service.status,
+               lx_service_service.phone,
+               (select count(*) from lx_service_serviceorder where lx_service_serviceorder.serviceid = lx_service_service.id) as ordersum,
+               (select avg(lx_service_serviceorder.level) from lx_service_serviceorder where lx_service_serviceorder.serviceid = lx_service_service.id) as avglevel,
+               (select lx_service_serviceapply.id from lx_service_serviceapply where lx_service_serviceapply.serviceid = lx_service_service.id) as applyid
+        from lx_service_service
+        where id = #{id}
+    </select>
+    <select id="list" resultType="cn.lexiang.singleservice.bean.service.Service"
+            parameterType="cn.lexiang.singleservice.bean.service.ServiceQueryVo">
+        select lx_service_service.id, lx_service_service.username,lx_service_service.realname,
+        lx_service_service.nick,lx_service_service.password,lx_service_service.headimg,lx_service_service.age,
+        lx_service_service.gender,lx_service_service.summary,lx_service_service.regtime,lx_service_service.regip,
+        lx_service_service.logintime,lx_service_service.loginip,lx_service_service.userid,
+        lx_service_service.address,lx_service_service.servicestatus,lx_service_service.role, lx_service_service.status,
+               (select count(*) from lx_service_serviceorder where lx_service_serviceorder.serviceid = lx_service_service.id) as ordersum,
+               (select avg(lx_service_serviceorder.level) from lx_service_serviceorder where lx_service_serviceorder.serviceid = lx_service_service.id) as avglevel,
+               (select lx_service_serviceapply.id from lx_service_serviceapply where lx_service_serviceapply.serviceid = lx_service_service.id) as applyid
+        from lx_service_service
+        <where>
+            <if test="key != null and key != ''">
+                and (
+                    username like "%"#{key}"%" or
+                    realname like "%"#{key}"%" or
+                    nick like "%"#{key}"%" or
+                    id like "%"#{key}"%"
+                )
+            </if>
+            <if test="ages != null">
+                and age &gt;= #{ages}
+            </if>
+            <if test="agem != null">
+                and age &lt;= #{agem}
+            </if>
+            <if test="gender != null">
+                and gender = #{gender}
+            </if>
+        </where>
+        <if test="sort == null">
+            order by regtime desc
+        </if>
+        <if test="sort == 1">
+            order by ordersum desc
+        </if>
+        <if test="sort == 2">
+            order by avglevel desc
+        </if>
+        limit #{start}, #{limit}
+    </select>
+    <select id="listSum" resultType="Integer"
+            parameterType="cn.lexiang.singleservice.bean.service.ServiceQueryVo">
+        select count(*) as sum
+        from lx_service_service
+        <where>
+            <if test="key != null and key != ''">
+                and (
+                username like "%"#{key}"%" or
+                realname like "%"#{key}"%" or
+                nick like "%"#{key}"%"
+                )
+            </if>
+            <if test="ages != null">
+                and age &gt;= #{ages}
+            </if>
+            <if test="agem != null">
+                and age &lt;= #{agem}
+            </if>
+            <if test="gender != null">
+                and gender = #{gender}
+            </if>
+        </where>
+    </select>
+    <select id="login" parameterType="cn.lexiang.singleservice.bean.service.Service" resultType="cn.lexiang.singleservice.bean.service.Service">
+          select id,username,realname,nick,password,headimg,age,phone,gender,summary,regtime,regip,loginip,userid,address,servicestatus,role,status
+          from  lx_service_service where username=#{username} and password=#{password}
+    </select>
+</mapper>

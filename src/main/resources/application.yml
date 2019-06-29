@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    username: root
+    password: lkl555
+    url: jdbc:mysql://lkl.qfengx.cn:3306/lexiang?useSSL=true
+    driver-class-name: com.mysql.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations:
+  - classpath*:mybatis/mapper/**/*Mapper.xml
+server:
+  port: 8082
+logging:
+  level:
+    cn:
+      lexiang:
+        singleservice: debug
+  file: /usr/local/lexiang/log/lexiang_single_service.log
